@@ -1,6 +1,8 @@
+import { useToast } from "@/components/ui/use-toast";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useCategories } from "@/hooks/use-categories";
 import { useGroups } from "@/hooks/use-groups";
+import { getBalance } from "@/lib/db/queries/accounts.queries";
 import {
   TAccountOption,
   TAccountType,
@@ -18,7 +20,6 @@ import {
   useEffect,
 } from "react";
 import { useFormContext } from "react-hook-form";
-import { useToast } from "../ui/use-toast";
 
 const TxnFormContext = createContext({});
 
@@ -88,7 +89,9 @@ export function useTxnFormContext() {
     }));
   }
 
-  const { data: categories, isLoading: isCatLoading } = useCategories();
+  const { data: categories, isLoading: isCatLoading } = useCategories(
+    formData.type
+  );
   let categoryOptions: {
     label: TCategoryParent;
     options: TCategoryOption[];
@@ -137,7 +140,7 @@ export function useTxnFormContext() {
   );
 
   const handleSourceChange = useCallback(
-    (event: unknown) => {
+    async (event: unknown) => {
       const selected = event as TAccountOption;
       if (!selected) {
         setValue("sourceId", 0);
@@ -147,12 +150,15 @@ export function useTxnFormContext() {
         setValue("sourceSelect.label", selected.label);
         setValue("sourceSelect.value", selected.value);
         setValue("sourceId", selected.value);
+        const balance = await getBalance(selected.value);
+        setValue("srcBalance", balance);
+        clearErrors("sourceSelect");
       }
     },
-    [setValue]
+    [setValue, clearErrors]
   );
   const handleDestinationChange = useCallback(
-    (event: unknown) => {
+    async (event: unknown) => {
       const selected = event as TAccountOption;
       if (!selected) {
         setValue("destinationId", 0);
@@ -162,9 +168,12 @@ export function useTxnFormContext() {
         setValue("destinationSelect.label", selected.label);
         setValue("destinationSelect.value", selected.value);
         setValue("destinationId", selected.value);
+        const balance = await getBalance(selected.value);
+        setValue("destBalance", balance);
+        clearErrors("destinationSelect");
       }
     },
-    [setValue]
+    [setValue, clearErrors]
   );
 
   const handleFrequencyChange = useCallback(

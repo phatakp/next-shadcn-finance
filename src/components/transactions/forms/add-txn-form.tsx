@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useModalContext } from "@/components/ui/modal-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
 import { constants } from "@/lib/config/constants";
+import { createTransaction } from "@/lib/db/mutations/transactions.mutations";
 import { NewTxnParams } from "@/lib/drizzle/zod-schemas";
 import { capitalize } from "@/lib/utils";
 import { TNewTxnParams, TransactionType } from "@/types";
@@ -15,6 +17,7 @@ import { TransactionForm } from "./transaction-form";
 
 export function AddTxnForm() {
   const { closeModal } = useModalContext();
+  const { toast } = useToast();
 
   const form = useForm<TNewTxnParams>({
     resolver: zodResolver(NewTxnParams),
@@ -23,25 +26,30 @@ export function AddTxnForm() {
       type: "expense",
       date: new Date(),
       isRecurring: false,
-      categoryId: 0,
-      categorySelect: undefined,
-      sourceId: 0,
-      sourceSelect: undefined,
-      destinationId: 0,
-      destinationSelect: undefined,
-      groupId: 0,
-      groupSelect: undefined,
-      frequency: undefined,
-      frequencySelect: undefined,
-      startDate: undefined,
-      endDate: undefined,
     },
   });
 
   const formData = form.watch();
+  console.log(form.formState.errors);
 
   async function onSubmit(values: TNewTxnParams) {
-    console.log(values);
+    const { success } = NewTxnParams.safeParse(values);
+    if (!success) {
+      toast({
+        title: "Error",
+        description: "Invalid parameters",
+        variant: "destructive",
+      });
+      return;
+    }
+    const resp = await createTransaction(values);
+    toast({
+      title: resp.success ? "Success" : "Error",
+      description: resp.message,
+      variant: resp.success ? "default" : "destructive",
+    });
+    if (resp.success) closeModal();
+
     closeModal();
   }
 

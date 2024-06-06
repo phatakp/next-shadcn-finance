@@ -24,6 +24,7 @@ export async function AcctTypeCard({
   isAsset = false,
 }: Props) {
   const { assets, liabilities } = await getAccountTypeTotals();
+
   let change = 0;
   if (isAsset && assets > 0) change = (value / assets) * 100;
   if (!isAsset && liabilities > 0) change = (balance / liabilities) * 100;

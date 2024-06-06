@@ -1,15 +1,17 @@
-"use client";
-
+import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/lib/config/site";
-import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { getSignInUrl, getUser } from "@workos-inc/authkit-nextjs";
+import Link from "next/link";
 import { MobileNav } from "./mobile-nav";
+import { NavHeader } from "./nav-header";
 import { NavLink } from "./nav-link";
 import { SiteLogo } from "./site-logo";
 import { ThemeSwitcher } from "./theme-switcher";
 
-export function SiteNavigation() {
-  const pathName = usePathname();
-  const title = pathName.slice(1);
+export async function SiteNavigation() {
+  const { user } = await getUser();
+  const authorizationUrl = await getSignInUrl();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -26,13 +28,14 @@ export function SiteNavigation() {
         <MobileNav />
 
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            <span className="md:hidden font-semibold capitalize text-lg">
-              {title}
-            </span>
-          </div>
-          <nav className="flex items-center">
+          <NavHeader />
+          <nav className="flex items-center gap-4">
             <ThemeSwitcher />
+            {!user && (
+              <Link href={authorizationUrl} className={cn(buttonVariants())}>
+                Login
+              </Link>
+            )}
           </nav>
         </div>
       </div>

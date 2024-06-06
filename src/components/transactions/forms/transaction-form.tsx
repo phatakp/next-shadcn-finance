@@ -1,11 +1,12 @@
 "use client";
 
+import { FormLabel } from "@/components/ui/form";
 import { FormDatePicker } from "@/components/ui/form-date-picker";
 import { FormInput } from "@/components/ui/form-input";
 import { FormSelect } from "@/components/ui/form-select";
 import { FormSwitch } from "@/components/ui/form-switch";
 import { constants } from "@/lib/config/constants";
-import { capitalize } from "@/lib/utils";
+import { capitalize, cn } from "@/lib/utils";
 import { TNewTxnParams, TransactionType } from "@/types";
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
@@ -60,32 +61,60 @@ export function TransactionForm({ value, isUpdate = false }: Props) {
 
       <div className="flex gap-4">
         {form.type !== "income" && (
-          <FormSelect
-            name="sourceSelect"
-            label="Source"
-            options={srcOptions}
-            isLoading={isSourceLoading}
-            onChange={handleSourceChange}
-            isSearchable
-            isClearable
-            noOptionsMessage={() => "No Accounts Found"}
-            isDisabled={isUpdate}
-            value={form.sourceSelect}
-          />
+          <div className="grid w-full">
+            <FormSelect
+              name="sourceSelect"
+              label="Source"
+              options={srcOptions}
+              isLoading={isSourceLoading}
+              onChange={handleSourceChange}
+              isSearchable
+              isClearable
+              noOptionsMessage={() => "No Accounts Found"}
+              isDisabled={isUpdate}
+              value={form.sourceSelect}
+            />
+            <FormLabel
+              className={cn(
+                "text-xs text-muted-foreground truncate -mt-1.5",
+                !form.sourceId && !isSourceLoading ? "opacity-0" : "opacity-100"
+              )}
+            >
+              <div className="inline-flex items-center gap-1">
+                <span>Balance:</span>
+                <span>{form.srcBalance}</span>
+              </div>
+            </FormLabel>
+          </div>
         )}
         {form.type !== "expense" && (
-          <FormSelect
-            name="destinationSelect"
-            label="Destination"
-            options={destOptions}
-            isLoading={isDestLoading}
-            onChange={handleDestinationChange}
-            isSearchable
-            isClearable
-            noOptionsMessage={() => "No Accounts Found"}
-            isDisabled={isUpdate}
-            value={form.destinationSelect}
-          />
+          <div className="grid w-full">
+            <FormSelect
+              name="destinationSelect"
+              label="Destination"
+              options={destOptions}
+              isLoading={isDestLoading}
+              onChange={handleDestinationChange}
+              isSearchable
+              isClearable
+              noOptionsMessage={() => "No Accounts Found"}
+              isDisabled={isUpdate}
+              value={form.destinationSelect}
+            />
+            <FormLabel
+              className={cn(
+                "text-xs text-muted-foreground truncate -mt-1.5",
+                !form.destinationId && !isDestLoading
+                  ? "opacity-0"
+                  : "opacity-100"
+              )}
+            >
+              <div className="inline-flex items-center gap-1">
+                <span>Balance:</span>
+                <span>{form.destBalance}</span>
+              </div>
+            </FormLabel>
+          </div>
         )}
       </div>
 

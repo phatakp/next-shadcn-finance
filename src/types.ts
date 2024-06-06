@@ -161,6 +161,7 @@ export type TransactionType = keyof typeof txnTypeObject;
 export type TFrequencyType = keyof typeof frequencyObject;
 export type TFullTxn = Transaction & {
   user: TUser;
+  category: TCategory;
   source: TAccount | null;
   destination: TAccount | null;
   group: TGroup | null;

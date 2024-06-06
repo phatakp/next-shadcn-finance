@@ -18,7 +18,7 @@ export function handleError(err: unknown): TActionResp {
     message = errAsStr.length > 0 ? errAsStr : message;
   }
   console.error(message);
-  return { success: true, message };
+  return { success: false, message };
 }
 
 export const createEnumObject = <T extends readonly [string, ...string[]]>(

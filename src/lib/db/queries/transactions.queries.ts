@@ -6,14 +6,18 @@ import { db } from "@/lib/drizzle";
 import { TFullTxn } from "@/types";
 import { getUser } from "@workos-inc/authkit-nextjs";
 import { eq } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
+import { categories } from "../schema/categories.schema";
 
 export const getTransactions = async () => {
   const { user } = await getUser({ ensureSignedIn: true });
+  const dest = alias(accounts, "dest");
 
   const rows = await db
     .select({
+      category: categories,
       source: accounts,
-      destination: accounts,
+      destination: dest,
       user: users,
       group: groups,
       txn: transactions,
@@ -21,11 +25,13 @@ export const getTransactions = async () => {
     .from(transactions)
     .where(eq(transactions.userId, user.id!))
     .innerJoin(users, eq(transactions.userId, users.id))
+    .innerJoin(categories, eq(categories.id, transactions.categoryId))
     .leftJoin(accounts, eq(transactions.sourceId, accounts.id))
-    .leftJoin(accounts, eq(transactions.destinationId, accounts.id))
+    .leftJoin(dest, eq(transactions.destinationId, dest.id))
     .leftJoin(groups, eq(transactions.groupId, groups.id));
   const result = rows.map((r) => ({
     ...r.txn,
+    category: r.category,
     source: r.source,
     destination: r.destination,
     group: r.group,

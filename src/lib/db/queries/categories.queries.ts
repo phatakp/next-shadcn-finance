@@ -2,13 +2,14 @@
 
 import { categories } from "@/lib/db/schema/categories.schema";
 import { db } from "@/lib/drizzle";
-import { TCategoryId, TCategoryParent } from "@/types";
+import { TCategoryId, TCategoryParent, TransactionType } from "@/types";
 import { eq } from "drizzle-orm";
 
-export const getCategories = async (parent?: TCategoryParent) => {
-  if (parent) return await getCategoriesByParent(parent);
+export const getCategories = async (type: TransactionType) => {
   const result = await db.select().from(categories);
-  return result;
+  if (type === "expense")
+    return result.filter((cat) => !["income", "transfer"].includes(cat.parent));
+  return result.filter((cat) => cat.parent === type);
 };
 
 export const getCategoryById = async (id: TCategoryId) => {

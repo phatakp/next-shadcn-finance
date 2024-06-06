@@ -8,15 +8,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { TAccountType, TFullAccount } from "@/types";
+import { getAccountsByType } from "@/lib/db/queries/accounts.queries";
+import { TAccountType } from "@/types";
 import { AccountList } from "../account-list";
 
 type Props = {
   type: TAccountType;
-  accounts: TFullAccount[];
 };
 
-export function AccountListCard({ type, accounts }: Props) {
+export async function AccountListCard({ type }: Props) {
+  const accounts = await getAccountsByType(type);
   return (
     <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
       <CardHeader className="flex flex-row items-center">

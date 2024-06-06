@@ -350,75 +350,188 @@ export const AccountIdSchema = AccountSchema.pick({ id: true });
 const TransactionSchema = createSelectSchema(transactions);
 export const NewTxnSchema = createInsertSchema(transactions);
 export const NewTxnParams = TransactionSchema.omit({
+  id: true,
   userId: true,
-}).extend({
-  amount: z.coerce.number(),
-  date: z.coerce.date(),
-  description: z.string().optional(),
-  categoryId: z.coerce.number().min(1),
-  categorySelect: z
-    .object({ label: z.any(), value: z.coerce.number() })
-    .optional(),
-  sourceId: z.coerce.number().optional(),
-  sourceSelect: z.object({
-    label: z.any(),
-    value: z.coerce.number().optional(),
-  }),
-  destinationId: z.coerce.number().optional(),
-  destinationSelect: z.object({
-    label: z.any(),
-    value: z.coerce.number().optional(),
-  }),
-  groupId: z.coerce.number().optional(),
-  groupSelect: z.object({
-    label: z.any(),
-    value: z.coerce.number().optional(),
-  }),
+})
+  .extend({
+    amount: z.coerce.number({ required_error: "Amount is required" }),
+    date: z.coerce.date({ required_error: "Date is required" }),
+    description: z.string().optional(),
+    categoryId: z.coerce.number().min(1),
+    categorySelect: z
+      .object({ label: z.any(), value: z.coerce.number() })
+      .required(),
+    srcBalance: z.coerce.number().optional(),
+    destBalance: z.coerce.number().optional(),
+    sourceId: z.coerce.number().optional(),
+    sourceSelect: z
+      .object({
+        label: z.any(),
+        value: z.coerce.number(),
+      })
+      .optional(),
+    destinationId: z.coerce.number().optional(),
+    destinationSelect: z
+      .object({
+        label: z.any(),
+        value: z.coerce.number(),
+      })
+      .optional(),
+    groupId: z.coerce.number().optional(),
+    groupSelect: z
+      .object({
+        label: z.any(),
+        value: z.coerce.number(),
+      })
+      .optional(),
 
-  //Recurring txn fields
-  startDate: z.string().min(8).optional(),
-  endDate: z.string().min(8).optional(),
-  frequency: z.enum(constants.frequency).optional(),
-  frequencySelect: z.object({
-    label: z.any(),
-    value: z.enum(constants.frequency).optional(),
-  }),
-});
+    //Recurring txn fields
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+    frequency: z.enum(constants.frequency).optional(),
+    frequencySelect: z
+      .object({
+        label: z.any(),
+        value: z.enum(constants.frequency),
+      })
+      .optional(),
+  })
+  .superRefine(
+    (
+      {
+        type,
+        sourceId,
+        destinationId,
+        isRecurring,
+        startDate,
+        endDate,
+        frequency,
+      },
+      context
+    ) => {
+      if (type !== "expense" && !destinationId)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Destination is required",
+          path: ["destinationSelect"],
+        });
+
+      if (type !== "income" && !sourceId)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Source is required",
+          path: ["sourceSelect"],
+        });
+
+      if (isRecurring && !frequency)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Frequency is required",
+          path: ["frequencySelect"],
+        });
+
+      if (isRecurring && !startDate)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Start Date is required",
+          path: ["startDate"],
+        });
+
+      if (startDate && endDate && startDate > endDate)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "End Date is invalid",
+          path: ["endDate"],
+        });
+    }
+  );
 
 export const UpdateTxnSchema = TransactionSchema.omit({
   userId: true,
-}).extend({
-  id: z.coerce.number().readonly(),
-  amount: z.coerce.number(),
-  date: z.coerce.date(),
-  description: z.string().optional(),
-  categoryId: z.coerce.number().min(1),
-  categorySelect: z.object({ label: z.any(), value: z.coerce.number() }),
-  sourceId: z.coerce.number().optional(),
-  sourceSelect: z.object({
-    label: z.any(),
-    value: z.coerce.number().optional(),
-  }),
-  destinationId: z.coerce.number().optional(),
-  destinationSelect: z.object({
-    label: z.any(),
-    value: z.coerce.number().optional(),
-  }),
-  groupId: z.coerce.number().optional(),
-  groupSelect: z.object({
-    label: z.any(),
-    value: z.coerce.number().optional(),
-  }),
+})
+  .extend({
+    id: z.coerce.number().readonly(),
+    amount: z.coerce.number(),
+    date: z.coerce.date(),
+    description: z.string().optional(),
+    categoryId: z.coerce.number().min(1),
+    categorySelect: z.object({ label: z.any(), value: z.coerce.number() }),
+    sourceId: z.coerce.number().optional(),
+    srcBalance: z.coerce.number().optional(),
+    destBalance: z.coerce.number().optional(),
+    sourceSelect: z.object({
+      label: z.any(),
+      value: z.coerce.number().optional(),
+    }),
+    destinationId: z.coerce.number().optional(),
+    destinationSelect: z.object({
+      label: z.any(),
+      value: z.coerce.number().optional(),
+    }),
+    groupId: z.coerce.number().optional(),
+    groupSelect: z.object({
+      label: z.any(),
+      value: z.coerce.number().optional(),
+    }),
 
-  //Recurring txn fields
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
-  frequency: z.enum(constants.frequency).optional(),
-  frequencySelect: z.object({
-    label: z.any(),
-    value: z.enum(constants.frequency).optional(),
-  }),
-});
+    //Recurring txn fields
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+    frequency: z.enum(constants.frequency).optional(),
+    frequencySelect: z.object({
+      label: z.any(),
+      value: z.enum(constants.frequency).optional(),
+    }),
+  })
+  .superRefine(
+    (
+      {
+        type,
+        sourceId,
+        destinationId,
+        isRecurring,
+        startDate,
+        endDate,
+        frequency,
+      },
+      context
+    ) => {
+      if (type !== "expense" && !sourceId)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Source is required",
+          path: ["sourceSelect"],
+        });
+
+      if (type !== "income" && !destinationId)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Destination is required",
+          path: ["destinationSelect"],
+        });
+
+      if (isRecurring && !frequency)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Frequency is required",
+          path: ["frequencySelect"],
+        });
+
+      if (isRecurring && !startDate)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Start Date is required",
+          path: ["startDate"],
+        });
+
+      if (startDate && endDate && startDate > endDate)
+        return context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "End Date is invalid",
+          path: ["endDate"],
+        });
+    }
+  );
 
 export const TxnIdSchema = TransactionSchema.pick({ id: true });
 

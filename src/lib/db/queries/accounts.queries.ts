@@ -143,3 +143,9 @@ export async function getTxnTypeAccounts(
     return result.filter((acct) => acct.id !== sourceId);
   return result;
 }
+
+export async function getBalance(id: TAccountId) {
+  const [acct] = await db.select().from(accounts).where(eq(accounts.id, id));
+
+  return acct?.balance ?? 0;
+}

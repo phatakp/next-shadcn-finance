@@ -100,9 +100,9 @@ export const FormSelect: FC<SelectProps> = ({
                     cn(isDisabled && "text-muted-foreground"),
                   menu: () =>
                     cn(
-                      "p-1 mt-2 border border-background bg-accent text-accent-foreground rounded-lg text-sm z-20 absolute"
+                      "p-1 mt-2 border border-background bg-accent text-accent-foreground rounded-lg text-sm z-50 absolute"
                     ),
-                  menuPortal: () => "shadow-md shadow-background z-20",
+                  menuPortal: () => "shadow-md shadow-background z-50",
 
                   control: ({ isFocused, isDisabled }) =>
                     cn(

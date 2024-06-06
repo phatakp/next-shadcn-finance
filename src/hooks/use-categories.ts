@@ -1,10 +1,11 @@
 import { getCategories } from "@/lib/db/queries/categories.queries";
-import { TCategoryParent } from "@/types";
+import { TransactionType } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 
-export function useCategories(parent?: TCategoryParent) {
+export function useCategories(type: TransactionType) {
   return useQuery({
-    queryKey: ["categories", parent],
-    queryFn: () => getCategories(parent),
+    queryKey: ["categories", type],
+    queryFn: () => getCategories(type),
+    enabled: !!type,
   });
 }

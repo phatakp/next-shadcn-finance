@@ -1,9 +1,6 @@
 "use server";
 
-import {
-  getAccountById,
-  getAccountsByType,
-} from "@/lib/db/queries/accounts.queries";
+import { getAccountsByType } from "@/lib/db/queries/accounts.queries";
 import { accounts } from "@/lib/db/schema/accounts.schema";
 import { db } from "@/lib/drizzle";
 import {
@@ -14,6 +11,7 @@ import { getStockData } from "@/lib/stock";
 import { handleError } from "@/lib/utils";
 import {
   TAccountId,
+  TAccountType,
   TActionResp,
   TMFAPIData,
   TNewAccountParams,
@@ -32,8 +30,8 @@ const decrement = (column: AnyColumn, value = 0) => {
   return sql`${column} - ${value}`;
 };
 
-const revalidateAccount = () => {
-  revalidatePath("/accounts");
+const revalidateAccount = (type?: TAccountType) => {
+  revalidatePath(`/accounts?type=${type ?? "savings"}`);
   revalidatePath("/dashboard");
 };
 
@@ -70,7 +68,7 @@ export const createAccount = async (
       .insert(accounts)
       .values({ ...newAccount, userId: user.id })
       .returning();
-    revalidateAccount();
+    revalidateAccount(acct.type);
     return {
       success: true,
       message: `Account ${acct.name} created successfully`,
@@ -91,7 +89,7 @@ export const updateAccount = async (account: TUpdateAccountParams) => {
       .set(updAcct)
       .where(and(eq(accounts.id, id), eq(accounts.userId, user.id)))
       .returning();
-    revalidateAccount();
+    revalidateAccount(acct.type);
     return {
       success: true,
       message: `Account ${acct.name} updated successfully`,
@@ -109,7 +107,7 @@ export const deleteAccount = async (id: TAccountId) => {
       .delete(accounts)
       .where(and(eq(accounts.id, id), eq(accounts.userId, user.id)))
       .returning();
-    revalidateAccount();
+    revalidateAccount(acct.type);
     return {
       success: true,
       message: `Account ${acct.name} deleted successfully`,
@@ -164,7 +162,7 @@ export async function refreshBalances() {
 
 export async function debitAccount(id: TAccountId, amt: number) {
   try {
-    const acct = await getAccountById(id);
+    const [acct] = await db.select().from(accounts).where(eq(accounts.id, id));
     if (!acct)
       return {
         success: false,
@@ -203,7 +201,7 @@ export async function debitAccount(id: TAccountId, amt: number) {
 
 export async function creditAccount(id: TAccountId, amt: number) {
   try {
-    const acct = await getAccountById(id);
+    const [acct] = await db.select().from(accounts).where(eq(accounts.id, id));
     if (!acct)
       return {
         success: false,
