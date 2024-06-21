@@ -11,6 +11,7 @@ import {
   TFrequencyOption,
   TGroupOption,
   TNewTxnParams,
+  TransactionType,
 } from "@/types";
 import {
   ReactNode,
@@ -51,7 +52,7 @@ export function useTxnFormContext() {
   }));
 
   const { data: sourceAccts, isLoading: isSourceLoading } = useAccounts(
-    formData.type,
+    formData.type as TransactionType,
     formData.sourceId
   );
   let srcOptions: {
@@ -62,7 +63,7 @@ export function useTxnFormContext() {
     const result = Object.groupBy(sourceAccts, ({ type }) => type);
     srcOptions = Object.entries(result).map(([key, option]) => ({
       label: key as TAccountType,
-      options: option.map((o) => ({
+      options: option!.map((o) => ({
         value: o.id,
         label: o.type === "investment" ? `${o.bank.name}-${o.name}` : o.name,
       })),
@@ -70,7 +71,7 @@ export function useTxnFormContext() {
   }
 
   const { data: destAccts, isLoading: isDestLoading } = useAccounts(
-    formData.type,
+    formData.type as TransactionType,
     formData.sourceId,
     true
   );
@@ -82,7 +83,7 @@ export function useTxnFormContext() {
     const result = Object.groupBy(destAccts, ({ type }) => type);
     destOptions = Object.entries(result).map(([key, option]) => ({
       label: key as TAccountType,
-      options: option.map((o) => ({
+      options: option!.map((o) => ({
         value: o.id,
         label: o.type === "investment" ? `${o.bank.name}-${o.name}` : o.name,
       })),
@@ -90,7 +91,7 @@ export function useTxnFormContext() {
   }
 
   const { data: categories, isLoading: isCatLoading } = useCategories(
-    formData.type
+    formData.type as TransactionType
   );
   let categoryOptions: {
     label: TCategoryParent;
@@ -100,7 +101,7 @@ export function useTxnFormContext() {
     const result = Object.groupBy(categories, ({ parent }) => parent);
     categoryOptions = Object.entries(result).map(([key, option]) => ({
       label: key as TCategoryParent,
-      options: option.map((o) => ({
+      options: option!.map((o) => ({
         value: o.id,
         label: o.name,
       })),

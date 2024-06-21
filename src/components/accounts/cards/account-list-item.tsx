@@ -4,7 +4,7 @@ import { AmountField } from "@/components/common/amount-field";
 import { useModalContext } from "@/components/ui/modal-form";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { maskAccount } from "@/lib/utils";
-import { TFullAccount } from "@/types";
+import { TAccountType, TFullAccount } from "@/types";
 
 type Props = {
   account: TFullAccount;
@@ -16,7 +16,7 @@ export function AccountListItem({ account }: Props) {
     <TableRow className="cursor-pointer" onClick={openModal}>
       <TableCell>
         <div className="font-medium">
-          {maskAccount(account.number, account.type)}
+          {maskAccount(account.number, account.type as TAccountType)}
         </div>
         <div className="hidden text-sm text-muted-foreground md:inline truncate capitalize">
           {account.name}

@@ -9,7 +9,12 @@ import {
   updateAccount,
 } from "@/lib/db/mutations/accounts.mutations";
 import { UpdateAccountSchema } from "@/lib/drizzle/zod-schemas";
-import { TAction, TFullAccount, TUpdateAccountParams } from "@/types";
+import {
+  TAction,
+  TFullAccount,
+  TInvestmentType,
+  TUpdateAccountParams,
+} from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -43,7 +48,7 @@ export function UpdateAccountForm({ account }: Props) {
       quantity: account.quantity ?? 0,
       asOfDate: account.asOfDate,
       type: account.type,
-      invType: account.invType ?? undefined,
+      invType: (account.invType as TInvestmentType) ?? undefined,
       isSIP: account.isSIP,
       bankId: account.bankId,
       bankSelect: { label: account.bank.name, value: account.bankId },

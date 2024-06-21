@@ -69,7 +69,9 @@ export function useAccountFormContext() {
     if (formData.type === "investment") setValue("invType", "equity");
   }, [formData.type, setValue, type]);
 
-  const { data: banks, isLoading: isBankLoading } = useBanks(formData.type);
+  const { data: banks, isLoading: isBankLoading } = useBanks(
+    formData.type as TAccountType
+  );
   let bankOptions = banks
     ?.filter((bank) => bank.name !== "Cash")
     .map((bank: TBank) => ({

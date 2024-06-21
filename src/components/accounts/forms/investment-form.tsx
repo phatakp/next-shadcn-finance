@@ -7,7 +7,7 @@ import { FormSwitch } from "@/components/ui/form-switch";
 import { useEquityData } from "@/hooks/use-equity-data";
 import { useFundData } from "@/hooks/use-fund-data";
 import { amountFormatter, cn, shortAmount } from "@/lib/utils";
-import { TInvestmentType, TNewAccountParams } from "@/types";
+import { TAccountType, TInvestmentType, TNewAccountParams } from "@/types";
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useAccountFormContext } from "../acct-form-context";
@@ -28,7 +28,7 @@ export function InvestmentForm({ value, isUpdate }: Props) {
   // Fetch Fund Data for entered MF scheme code
   const { data: fund, isLoading: isFundLoading } = useFundData(
     form.number,
-    form.type,
+    form.type as TAccountType,
     form.invType
   );
   const fundName = fund?.meta?.scheme_name ?? "";
@@ -38,7 +38,7 @@ export function InvestmentForm({ value, isUpdate }: Props) {
   const { data: equity, isLoading: isEquityLoading } = useEquityData(
     form.number,
     form.moneyControlPrefix ?? undefined,
-    form.type,
+    form.type as TAccountType,
     form.invType
   );
 
