@@ -16,6 +16,11 @@ export const getUserById = async (id: TUserId) => {
   return row;
 };
 
+export const getUserByEmail = async (email: string) => {
+  const [row] = await db.select().from(users).where(eq(users.email, email));
+  return row;
+};
+
 export const getUserWithCashAcctById = async (id: TUserId, cashId: TBankId) => {
   const cashAcct = db
     .select()

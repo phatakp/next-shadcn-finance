@@ -9,7 +9,11 @@ import {
 import Image from "next/image";
 import { Button } from "../ui/button";
 
-export default function UserDropdown() {
+type Props = {
+  logoutUser: () => void;
+};
+
+export default function UserDropdown({ logoutUser }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,7 +37,7 @@ export default function UserDropdown() {
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuItem>Support</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => logoutUser()}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -1,26 +1,26 @@
 import {
-  boolean,
   index,
   integer,
-  pgTable,
   real,
-  serial,
+  sqliteTable,
   text,
   uniqueIndex,
-} from "drizzle-orm/pg-core";
+} from "drizzle-orm/sqlite-core";
 import { banks } from "./banks.schema";
-import { bankTypeEnum, invTypeEnum } from "./enums.schema";
+import { accountTypes, invTypes } from "./enums.schema";
 import { users } from "./users.schema";
 
-export const accounts = pgTable(
+export const accounts = sqliteTable(
   "accounts",
   {
-    id: serial("id").primaryKey(),
+    id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
     number: text("number").notNull(),
     name: text("name").notNull(),
-    type: bankTypeEnum("bank_type").notNull().default("savings"),
+    type: text("type")
+      .references(() => accountTypes.type, { onDelete: "cascade" })
+      .notNull(),
     balance: real("balance").notNull().default(0),
-    isDefaultAcct: boolean("is_default_acct").default(false),
+    isDefaultAcct: integer("is_default", { mode: "boolean" }).default(false),
     asOfDate: text("as_of_date"),
     bankId: integer("bank_id")
       .references(() => banks.id, { onDelete: "cascade" })
@@ -31,8 +31,10 @@ export const accounts = pgTable(
 
     //Investment account fields
     currValue: real("curr_value").notNull().default(0),
-    invType: invTypeEnum("inv_type"),
-    isSIP: boolean("is_sip").default(false),
+    invType: text("inv_type").references(() => invTypes.type, {
+      onDelete: "set null",
+    }),
+    isSIP: integer("is_sip", { mode: "boolean" }).default(false),
 
     // Fields for mutual funds only
     nav: real("nav").default(0),

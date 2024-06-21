@@ -10,6 +10,7 @@ import {
   TUpdateUserParams,
   TUserId,
 } from "@/types";
+import { signOut } from "@workos-inc/authkit-nextjs";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -63,3 +64,5 @@ export const deleteUser = async (id: TUserId) => {
     return handleError(err);
   }
 };
+
+export const logoutUser = async () => await signOut();

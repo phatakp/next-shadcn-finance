@@ -1,29 +1,24 @@
 import {
   integer,
-  pgTable,
   primaryKey,
-  serial,
+  sqliteTable,
   text,
-} from "drizzle-orm/pg-core";
+} from "drizzle-orm/sqlite-core";
 import { users } from "./users.schema";
 
-export const groups = pgTable("groups", {
-  id: serial("id").primaryKey(),
+export const groups = sqliteTable("groups", {
+  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text("text").notNull(),
 });
 
-export const groupUsers = pgTable(
+export const groupUsers = sqliteTable(
   "group_users",
   {
     groupId: integer("group_id")
-      .references(() => groups.id, {
-        onDelete: "cascade",
-      })
+      .references(() => groups.id, { onDelete: "cascade" })
       .notNull(),
     userId: text("user_id")
-      .references(() => users.id, {
-        onDelete: "cascade",
-      })
+      .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
   },
   (groupUsers) => {

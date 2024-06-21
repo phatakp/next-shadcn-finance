@@ -1,12 +1,19 @@
-import { pgTable, serial, text, uniqueIndex } from "drizzle-orm/pg-core";
-import { bankTypeEnum } from "./enums.schema";
+import {
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
+import { accountTypes } from "./enums.schema";
 
-export const banks = pgTable(
+export const banks = sqliteTable(
   "banks",
   {
-    id: serial("id").primaryKey(),
+    id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
     name: text("name").notNull(),
-    type: bankTypeEnum("bank_type").notNull().default("savings"),
+    type: text("type")
+      .references(() => accountTypes.type, { onDelete: "cascade" })
+      .notNull(),
   },
   (banks) => {
     return {

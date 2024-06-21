@@ -1,13 +1,18 @@
-import { pgTable, serial, text, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
+import { parentCategories } from "./enums.schema";
 
-import { parentCategoryEnum } from "./enums.schema";
-
-export const categories = pgTable(
+export const categories = sqliteTable(
   "categories",
   {
-    id: serial("id").primaryKey(),
+    id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
     name: text("name").notNull(),
-    parent: parentCategoryEnum("parent_category")
+    parent: text("type")
+      .references(() => parentCategories.parent, { onDelete: "cascade" })
       .notNull()
       .default("miscellaneous"),
   },

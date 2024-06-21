@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
-export const users = pgTable(
+export const users = sqliteTable(
   "users",
   {
     id: text("id").primaryKey(),
@@ -9,10 +9,7 @@ export const users = pgTable(
     lastName: text("last_name"),
     email: text("email").notNull(),
     image: text("image"),
-
-    createdAt: timestamp("created_at")
-      .notNull()
-      .default(sql`now()`),
+    createdAt: text("timestamp").default(sql`(CURRENT_TIMESTAMP)`),
   },
   (users) => {
     return {

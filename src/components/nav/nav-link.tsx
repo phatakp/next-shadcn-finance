@@ -17,7 +17,7 @@ export function NavLink({ href, title }: Props) {
     <Link
       className={cn(
         "transition-colors hover:text-foreground/80 text-foreground/60",
-        isActive && "text-primary"
+        isActive && "text-primary dark:text-primary-light"
       )}
       href={href}
     >

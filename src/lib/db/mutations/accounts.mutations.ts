@@ -45,7 +45,13 @@ export const createCashAccountForUser = async (
   try {
     const [acct] = await db
       .insert(accounts)
-      .values({ name: "Cash Available", number: "000000", bankId, userId })
+      .values({
+        name: "Cash Available",
+        number: "000000",
+        bankId,
+        userId,
+        type: "savings",
+      })
       .returning();
     revalidateAccount();
     return {
@@ -68,7 +74,7 @@ export const createAccount = async (
       .insert(accounts)
       .values({ ...newAccount, userId: user.id })
       .returning();
-    revalidateAccount(acct.type);
+    revalidateAccount(acct.type as TAccountType);
     return {
       success: true,
       message: `Account ${acct.name} created successfully`,
@@ -89,7 +95,7 @@ export const updateAccount = async (account: TUpdateAccountParams) => {
       .set(updAcct)
       .where(and(eq(accounts.id, id), eq(accounts.userId, user.id)))
       .returning();
-    revalidateAccount(acct.type);
+    revalidateAccount(acct.type as TAccountType);
     return {
       success: true,
       message: `Account ${acct.name} updated successfully`,
@@ -107,7 +113,7 @@ export const deleteAccount = async (id: TAccountId) => {
       .delete(accounts)
       .where(and(eq(accounts.id, id), eq(accounts.userId, user.id)))
       .returning();
-    revalidateAccount(acct.type);
+    revalidateAccount(acct.type as TAccountType);
     return {
       success: true,
       message: `Account ${acct.name} deleted successfully`,

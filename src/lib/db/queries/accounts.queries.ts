@@ -9,10 +9,12 @@ import {
   TAccountId,
   TAccountType,
   TFullAccount,
+  TInvestmentType,
   TransactionType,
 } from "@/types";
 import { getUser } from "@workos-inc/authkit-nextjs";
 import { and, desc, eq, sql } from "drizzle-orm";
+import { accountTypes, invTypes } from "../schema/enums.schema";
 
 export const getAccounts = async () => {
   const { user } = await getUser({ ensureSignedIn: true });
@@ -148,4 +150,22 @@ export async function getBalance(id: TAccountId) {
   const [acct] = await db.select().from(accounts).where(eq(accounts.id, id));
 
   return acct?.balance ?? 0;
+}
+
+export async function getAcctType(type: TAccountType) {
+  const [result] = await db
+    .select()
+    .from(accountTypes)
+    .where(eq(accountTypes.type, type));
+
+  return result.type;
+}
+
+export async function getInvType(type: TInvestmentType) {
+  const [result] = await db
+    .select()
+    .from(invTypes)
+    .where(eq(invTypes.type, type));
+
+  return result.type;
 }

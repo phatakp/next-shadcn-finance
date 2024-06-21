@@ -18,11 +18,13 @@ export async function SiteNavigation() {
       <div className="container flex h-14 items-center gap-4">
         <div className="mr-4 hidden md:flex">
           <SiteLogo />
-          <nav className="flex items-center gap-4 text-sm lg:gap-6">
-            {siteConfig.navlinks.map((link) => (
-              <NavLink key={link.href} {...link} />
-            ))}
-          </nav>
+          {!!user && (
+            <nav className="flex items-center gap-4 text-sm lg:gap-6">
+              {siteConfig.navlinks.map((link) => (
+                <NavLink key={link.href} {...link} />
+              ))}
+            </nav>
+          )}
         </div>
 
         <MobileNav />

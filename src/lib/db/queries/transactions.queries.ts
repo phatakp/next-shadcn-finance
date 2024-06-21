@@ -6,7 +6,7 @@ import { db } from "@/lib/drizzle";
 import { TFullTxn } from "@/types";
 import { getUser } from "@workos-inc/authkit-nextjs";
 import { eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+import { alias } from "drizzle-orm/sqlite-core";
 import { categories } from "../schema/categories.schema";
 
 export const getTransactions = async () => {

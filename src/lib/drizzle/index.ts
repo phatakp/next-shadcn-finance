@@ -1,14 +1,17 @@
-import { neon } from "@neondatabase/serverless";
+import { createClient } from "@libsql/client";
 import "dotenv/config";
-import { drizzle, NeonHttpDatabase } from "drizzle-orm/neon-http";
+import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 
 declare global {
   // eslint-disable-next-line no-var, no-unused-vars
-  var _db: NeonHttpDatabase<Record<string, never>> | undefined;
+  var _db: LibSQLDatabase<Record<string, never>> | undefined;
 }
 
-let db: NeonHttpDatabase<Record<string, never>>;
-export const client = neon(process.env.DATABASE_URL as string);
+let db: LibSQLDatabase<Record<string, never>>;
+export const client = createClient({
+  url: process.env.DATABASE_URL as string,
+  authToken: process.env.DB_AUTH_TOKEN,
+});
 
 if (process.env.NODE_ENV === "production") {
   db = drizzle(client);

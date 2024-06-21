@@ -1,27 +1,26 @@
 import {
-  boolean,
-  date,
   index,
   integer,
-  pgTable,
   real,
-  serial,
+  sqliteTable,
   text,
-  varchar,
-} from "drizzle-orm/pg-core";
+} from "drizzle-orm/sqlite-core";
 import { accounts } from "./accounts.schema";
 import { categories } from "./categories.schema";
-import { frequencyEnum, txnTypeEnum } from "./enums.schema";
+import { frequency, txnTypes } from "./enums.schema";
 import { groups } from "./groups.schema";
 import { users } from "./users.schema";
 
-export const transactions = pgTable(
+export const transactions = sqliteTable(
   "transactions",
   {
-    id: serial("id").primaryKey(),
-    date: date("date").notNull(),
-    description: varchar("description", { length: 255 }),
-    type: txnTypeEnum("txn_type").notNull().default("expense"),
+    id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+    date: integer("date", { mode: "timestamp" }).notNull(),
+    description: text("description"),
+    type: text("type")
+      .references(() => txnTypes.type, { onDelete: "cascade" })
+      .notNull()
+      .default("expense"),
     amount: real("amount").notNull().default(0),
     categoryId: integer("category_id")
       .references(() => categories.id, { onDelete: "cascade" })
@@ -40,10 +39,12 @@ export const transactions = pgTable(
       .notNull(),
 
     //Recurring transaction fields
-    isRecurring: boolean("is_recurring").default(false),
-    frequency: frequencyEnum("frequency"),
-    startDate: date("start_date", { mode: "date" }),
-    endDate: date("end_date", { mode: "date" }),
+    isRecurring: integer("is_recurring", { mode: "boolean" }).default(false),
+    frequency: text("frequency").references(() => frequency.type, {
+      onDelete: "set null",
+    }),
+    startDate: integer("start_date", { mode: "timestamp" }),
+    endDate: integer("end_date", { mode: "timestamp" }),
   },
   (txns) => {
     return {

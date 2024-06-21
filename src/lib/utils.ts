@@ -38,17 +38,17 @@ export const amountFormatter = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 2,
 });
 
-export const shortAmount = (amt: number) => {
+export const shortAmount = (amt: number, dec?: number) => {
   if (amt > 10000000) {
-    const num = (amt / 10000000).toFixed(2);
+    const num = (amt / 10000000).toFixed(dec ?? 2);
     return num + "Cr";
   }
   if (amt > 100000) {
-    const num = (amt / 100000).toFixed(2);
+    const num = (amt / 100000).toFixed(dec ?? 2);
     return num + "L";
   }
-  if (amt > 1000) {
-    const num = (amt / 1000).toFixed(2);
+  if (amt >= 1000) {
+    const num = (amt / 1000).toFixed(dec ?? 2);
     return num + "K";
   }
   return amt.toFixed();

@@ -2,7 +2,7 @@ import { accounts } from "@/lib/db/schema/accounts.schema";
 import { banks } from "@/lib/db/schema/banks.schema";
 import { categories } from "@/lib/db/schema/categories.schema";
 import {
-  bankTypeObject,
+  acctTypeObject,
   frequencyObject,
   invTypeObject,
   parentCategoryObject,
@@ -96,7 +96,7 @@ export type TBank = typeof banks.$inferSelect;
 export type TNewBank = z.infer<typeof NewBankSchema>;
 export type TNewBankParams = z.infer<typeof NewBankParams>;
 export type TBankId = z.infer<typeof BankIdSchema>["id"];
-export type TBankType = keyof typeof bankTypeObject;
+export type TBankType = keyof typeof acctTypeObject;
 export type TBankOption = { label: string; value: TBankId };
 
 // Types for categories - used to type API request params and within Components
@@ -114,7 +114,7 @@ export type TNewAccount = z.infer<typeof NewAccountSchema>;
 export type TNewAccountParams = z.infer<typeof NewAccountParams>;
 export type TUpdateAccountParams = z.infer<typeof UpdateAccountSchema>;
 export type TAccountId = z.infer<typeof AccountIdSchema>["id"];
-export type TAccountType = keyof typeof bankTypeObject;
+export type TAccountType = keyof typeof acctTypeObject;
 export type TInvestmentType = keyof typeof invTypeObject;
 export type TFullAccount = TAccount & { user: TUser; bank: TBank };
 export type TAccountTypeOption = { label: string; value: TAccountType };
